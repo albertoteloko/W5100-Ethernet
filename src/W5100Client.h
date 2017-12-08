@@ -14,13 +14,14 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef client_h
-#define client_h
+#ifndef w5100_client_h
+#define w5100_client_h
 #include "Print.h"
 #include "Stream.h"
 #include "spark_wiring_ipaddress.h"
+#include "utility/base.h"
 
-class Client: public Stream {
+class W5100Client: public Stream, public Base {
 
     public:
         virtual int connect(IPAddress ip, uint16_t port) =0;
@@ -35,11 +36,6 @@ class Client: public Stream {
         virtual void stop() = 0;
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
-    protected:
-        uint8_t* rawIPAddress(IPAddress& addr) {
-            return addr.raw_address();
-        }
-        ;
 };
 
 #endif

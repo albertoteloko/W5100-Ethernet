@@ -2,10 +2,10 @@
 #define ethernetclient_h
 #include "Arduino.h"	
 #include "Print.h"
-#include "Client.h"
+#include "W5100Client.h"
 #include "spark_wiring_ipaddress.h"
 
-class EthernetClient : public Client {
+class EthernetClient : public W5100Client {
 
 public:
   EthernetClient();

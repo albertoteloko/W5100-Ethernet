@@ -1,12 +1,13 @@
 #ifndef ethernetserver_h
 #define ethernetserver_h
 
-#include "Server.h"
+#include "W5100Client.h"
+#include "W5100Server.h"
 
 class EthernetClient;
 
 class EthernetServer :
-public Server {
+public W5100Server {
 private:
   uint16_t _port;
   void accept();

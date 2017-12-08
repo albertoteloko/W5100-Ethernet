@@ -3,16 +3,19 @@
 
 #include <inttypes.h>
 //#include "w5100.h"
+#include "spark_wiring_ipaddress.h"
 #include "EthernetClient.h"
 #include "EthernetServer.h"
 #include "Dhcp.h"
+#include "utility/base.h"
 
 #define MAX_SOCK_NUM 4
 
-class EthernetClass {
+class EthernetClass : public Base {
 private:
   IPAddress _dnsServerAddress;
   DhcpClass* _dhcp;
+
 public:
   static uint8_t _state[MAX_SOCK_NUM];
   static uint16_t _server_port[MAX_SOCK_NUM];

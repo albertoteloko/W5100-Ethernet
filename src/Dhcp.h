@@ -4,6 +4,7 @@
 #ifndef Dhcp_h
 #define Dhcp_h
 
+#include "utility/base.h"
 #include "EthernetUdp.h"
 
 /* DHCP state machine. */
@@ -136,7 +137,7 @@ typedef struct __attribute__((packed)) _RIP_MSG_FIXED
 	uint8_t  chaddr[6];
 }RIP_MSG_FIXED;
 
-class DhcpClass {
+class DhcpClass : public Base {
 private:
   uint32_t _dhcpInitialTransactionId;
   uint32_t _dhcpTransactionId;
@@ -163,6 +164,7 @@ private:
   void printByte(char *, uint8_t);
   
   uint8_t parseDHCPResponse(unsigned long responseTimeout, uint32_t& transactionId);
+
 public:
   IPAddress getLocalIp();
   IPAddress getSubnetMask();

@@ -38,10 +38,11 @@
 #define ethernetudp_h
 
 #include <spark_wiring_udp.h>
+#include "utility/base.h"
 
 #define UDP_TX_PACKET_MAX_SIZE 24
 
-class EthernetUDP : public UDP {
+class EthernetUDP : public UDP , public Base {
 private:
   uint16_t _port; // local port to listen on
   IPAddress _remoteIP; // remote IP address for the incoming packet whilst it's being processed

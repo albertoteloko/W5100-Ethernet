@@ -14,12 +14,12 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef server_h
-#define server_h
+#ifndef w5100_server_h
+#define w5100_server_h
 
 #include "Print.h"
 
-class Server: public Print {
+class W5100Server: public Print {
     public:
         virtual void begin() =0;
 };

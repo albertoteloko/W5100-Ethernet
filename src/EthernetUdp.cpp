@@ -29,6 +29,7 @@
 #include "utility/w5100.h"
 #include "utility/socket.h"
 #include "Ethernet.h"
+#include "spark_wiring_client.h"
 #include "spark_wiring_udp.h"
 #include "Dns.h"
 
@@ -246,5 +247,3 @@ uint8_t EthernetUDP::beginMulticast(IPAddress ip, uint16_t port)
   socket(_sock, SnMR::UDP, port, SnMR::MULTI);
   return 1;
 }
-
-
