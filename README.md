@@ -1,6 +1,14 @@
-= Ethernet Library for Arduino =
+= Ethernet Library for Particle =
 
-With the Arduino Ethernet Shield, this library allows an Arduino board to connect to the internet.
+You can connect to any W5100 arduino shield compatible. With the Arduino Ethernet Shield, this library allows an Arduino board to connect to the internet.
+
+In order to select SPI port and CS pin:
+
+```c++
+#include <utility/w5100.h>
+
+W5100.spi(SPI1, D5);
+```
 
 For more information about this library please visit us at
 http://www.arduino.cc/en/Reference/Ethernet
