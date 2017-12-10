@@ -341,6 +341,15 @@ public:
   // initSS(), setSS(), resetSS() not needed with EXTENDED_CS_PIN_HANDLING
 #endif
 
+public:
+#if SPI_TO_USE == 1
+  inline static void beginTransaction() { SPI1.beginTransaction(SPI_ETHERNET_SETTINGS);};
+  inline static void endTransaction() { SPI1.endTransaction();};
+#else
+  inline static void beginTransaction() { SPI.beginTransaction(SPI_ETHERNET_SETTINGS);};
+  inline static void endTransaction() { SPI.endTransaction();};
+#endif
+
 };
 
 extern W5100Class W5100;
