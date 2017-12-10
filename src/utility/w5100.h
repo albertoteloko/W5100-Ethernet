@@ -11,6 +11,7 @@
 #define	W5100_H_INCLUDED
 
 #include <SPI.h>
+#include <utility/base.h>
 
 #define MAX_SOCK_NUM 4
 
@@ -125,7 +126,7 @@ public:
   static const uint8_t RAW  = 255;
 };
 
-class W5100Class {
+class W5100Class : public Base {
 
 public:
   void init();
@@ -250,7 +251,6 @@ private:
   static inline uint8_t writeSn(SOCKET _s, uint16_t _addr, uint8_t _data);
   static inline uint16_t readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
   static inline uint16_t writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
-  inline void rawIPAddress(IPAddress src, uint8_t *dst);
 
 
   static const uint16_t CH_BASE = 0x0400;
@@ -322,33 +322,27 @@ private:
   uint16_t SBASE[SOCKETS]; // Tx buffer base address
   uint16_t RBASE[SOCKETS]; // Rx buffer base address
 
-
 public:
-#if SPI_TO_USE == 1
-  #define ETHERNET_SHIELD_SPI_CS D5
-#else
-  #define ETHERNET_SHIELD_SPI_CS A2
+#if !defined(ETHERNET_SHIELD_SPI)
+    #define ETHERNET_SHIELD_SPI SPI
 #endif
 
-public:
-#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
-  #define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
-  inline static void initSS() { pinMode(ETHERNET_SHIELD_SPI_CS, OUTPUT); pinMode(D7, OUTPUT);};
-  inline static void setSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, LOW); digitalWrite(D7, LOW);};
-  inline static void resetSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, HIGH);digitalWrite(D7, HIGH); };
-#else
-  #define SPI_ETHERNET_SETTINGS ETHERNET_SHIELD_SPI_CS,SPISettings(8000000, MSBFIRST, SPI_MODE0)
-  // initSS(), setSS(), resetSS() not needed with EXTENDED_CS_PIN_HANDLING
+#if !defined(ETHERNET_SHIELD_SPI_CS)
+    #define ETHERNET_SHIELD_SPI_CS A2
 #endif
 
-public:
-#if SPI_TO_USE == 1
-  inline static void beginTransaction() { SPI1.beginTransaction(SPI_ETHERNET_SETTINGS);};
-  inline static void endTransaction() { SPI1.endTransaction();};
-#else
-  inline static void beginTransaction() { SPI.beginTransaction(SPI_ETHERNET_SETTINGS);};
-  inline static void endTransaction() { SPI.endTransaction();};
-#endif
+#define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
+
+inline static void initSS() { pinMode(ETHERNET_SHIELD_SPI_CS, OUTPUT);};
+inline static void setSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, LOW);};
+inline static void resetSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, HIGH); };
+
+inline static void beginTransaction() { ETHERNET_SHIELD_SPI.beginTransaction(SPI_ETHERNET_SETTINGS);};
+inline static void endTransaction() { ETHERNET_SHIELD_SPI.endTransaction();};
+
+private:
+inline static void spiBegin() { ETHERNET_SHIELD_SPI.begin();};
+inline static uint8_t spiTransfer(uint8_t value) { return ETHERNET_SHIELD_SPI.transfer(value);};
 
 };
 
@@ -420,15 +414,6 @@ void W5100Class::setRetransmissionTime(uint16_t _timeout) {
 
 void W5100Class::setRetransmissionCount(uint8_t _retry) {
   writeRCR(_retry);
-}
-
-void W5100Class::rawIPAddress(IPAddress address, uint8_t *dst) {
-    uint8_t* src =  (uint8_t*)&address.raw().ipv4;
-
-    uint8_t size = 4;
-    for ( uint8_t i = 0; i < size; i++ ) {
-        *(dst + i) = *(src + (size - i  - 1));
-    }
 }
 
 #endif
