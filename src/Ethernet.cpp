@@ -18,7 +18,7 @@ int EthernetClass::begin(uint8_t *mac_address, unsigned long timeout, unsigned l
   W5100.init();
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   W5100.setMACAddress(mac_address);
-  W5100.setIPAddress(rawIPAddress(IPAddress(0,0,0,0)));
+  W5100.setIPAddress(IPAddress(0,0,0,0));
   SPI.endTransaction();
 
   // Now try to get our config info from a DHCP server
@@ -28,9 +28,9 @@ int EthernetClass::begin(uint8_t *mac_address, unsigned long timeout, unsigned l
     // We've successfully found a DHCP server and got our configuration info, so set things
     // accordingly
     SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
-    W5100.setIPAddress(_dhcp->rawIPAddress(getLocalIp()));
-    W5100.setGatewayIp(_dhcp->rawIPAddress(getGatewayIp()));
-    W5100.setSubnetMask(_dhcp->rawIPAddress(getSubnetMask()));
+    W5100.setIPAddress(_dhcp->getLocalIp());
+    W5100.setGatewayIp(_dhcp->getGatewayIp());
+    W5100.setSubnetMask(_dhcp->getSubnetMask());
     SPI.endTransaction();
     _dnsServerAddress = _dhcp->getDnsServerIp();
   }
@@ -67,9 +67,9 @@ void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress dns_server
   W5100.init();
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   W5100.setMACAddress(mac);
-  W5100.setIPAddress(rawIPAddress(local_ip));
-  W5100.setGatewayIp(rawIPAddress(gateway));
-  W5100.setSubnetMask(rawIPAddress(subnet));
+  W5100.setIPAddress(local_ip);
+  W5100.setGatewayIp(gateway);
+  W5100.setSubnetMask(subnet);
   SPI.endTransaction();
   _dnsServerAddress = dns_server;
 }
@@ -87,9 +87,9 @@ int EthernetClass::maintain(){
       case DHCP_CHECK_REBIND_OK:
         //we might have got a new IP.
         SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
-        W5100.setIPAddress(_dhcp->rawIPAddress(getLocalIp()));
-        W5100.setGatewayIp(_dhcp->rawIPAddress(getGatewayIp()));
-        W5100.setSubnetMask(_dhcp->rawIPAddress(getSubnetMask()));
+        W5100.setIPAddress(_dhcp->getLocalIp());
+        W5100.setGatewayIp(_dhcp->getGatewayIp());
+        W5100.setSubnetMask(_dhcp->getSubnetMask());
         SPI.endTransaction();
         _dnsServerAddress = _dhcp->getDnsServerIp();
         break;
@@ -103,27 +103,24 @@ int EthernetClass::maintain(){
 
 IPAddress EthernetClass::localIP()
 {
-  IPAddress ret;
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
-  W5100.getIPAddress(rawIPAddress(ret));
+  IPAddress ret = W5100.getIPAddress();
   SPI.endTransaction();
   return ret;
 }
 
 IPAddress EthernetClass::subnetMask()
 {
-  IPAddress ret;
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
-  W5100.getSubnetMask(rawIPAddress(ret));
+  IPAddress ret = W5100.getSubnetMask();
   SPI.endTransaction();
   return ret;
 }
 
 IPAddress EthernetClass::gatewayIP()
 {
-  IPAddress ret;
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
-  W5100.getGatewayIp(rawIPAddress(ret));
+  IPAddress ret = W5100.getGatewayIp();
   SPI.endTransaction();
   return ret;
 }

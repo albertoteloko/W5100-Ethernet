@@ -95,8 +95,10 @@ int EthernetUDP::beginPacket(const char *host, uint16_t port)
 
 int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
 {
+  uint8_t rawIp [4];
+  rawIPAddress(ip, rawIp);
   _offset = 0;
-  return startUDP(_sock, rawIPAddress(ip), port);
+  return startUDP(_sock, rawIp, port);
 }
 
 int EthernetUDP::endPacket()
@@ -239,7 +241,10 @@ uint8_t EthernetUDP::beginMulticast(IPAddress ip, uint16_t port)
   mac[4] = ip[2];
   mac[5] = ip[3];
 
-  W5100.writeSnDIPR(_sock, rawIPAddress(ip));   //239.255.0.1
+  uint8_t rawIp [4];
+  rawIPAddress(ip, rawIp);
+
+  W5100.writeSnDIPR(_sock, rawIp);   //239.255.0.1
   W5100.writeSnDPORT(_sock, port);
   W5100.writeSnDHAR(_sock,mac);
 

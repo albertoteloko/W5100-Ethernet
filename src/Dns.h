@@ -6,8 +6,9 @@
 #define DNSClient_h
 
 #include <EthernetUdp.h>
+#include "utility/base.h"
 
-class DNSClient
+class DNSClient : public Base
 {
 public:
     // ctor

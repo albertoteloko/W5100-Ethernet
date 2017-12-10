@@ -168,26 +168,25 @@ public:
    */
   void recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uint8_t peek = 0);
 
-  inline void setGatewayIp(uint8_t *_addr);
-  inline void getGatewayIp(uint8_t *_addr);
-
-  inline void setSubnetMask(uint8_t *_addr);
-  inline void getSubnetMask(uint8_t *_addr);
-
   inline void setMACAddress(uint8_t * addr);
   inline void getMACAddress(uint8_t * addr);
 
-  inline void setIPAddress(uint8_t * addr);
-  inline void getIPAddress(uint8_t * addr);
+  inline void setIPAddress(IPAddress address);
+  inline IPAddress getIPAddress();
+
+  inline void setSubnetMask(IPAddress address);
+  inline IPAddress getSubnetMask();
+
+  inline void setGatewayIp(IPAddress address);
+  inline IPAddress getGatewayIp();
 
   inline void setRetransmissionTime(uint16_t timeout);
   inline void setRetransmissionCount(uint8_t _retry);
 
   void execCmdSn(SOCKET s, SockCMD _cmd);
-  
+
   uint16_t getTXFreeSize(SOCKET s);
   uint16_t getRXReceivedSize(SOCKET s);
-  
 
   // W5100 Registers
   // ---------------
@@ -196,7 +195,7 @@ private:
   static uint16_t write(uint16_t addr, const uint8_t *buf, uint16_t len);
   static uint8_t read(uint16_t addr);
   static uint16_t read(uint16_t addr, uint8_t *buf, uint16_t len);
-  
+
 #define __GP_REGISTER8(name, address)             \
   static inline void write##name(uint8_t _data) { \
     write(address, _data);                        \
@@ -239,7 +238,7 @@ public:
   __GP_REGISTER8 (PMAGIC, 0x0029);    // PPP LCP Magic Number
   __GP_REGISTER_N(UIPR,   0x002A, 4); // Unreachable IP address in UDP mode
   __GP_REGISTER16(UPORT,  0x002E);    // Unreachable Port address in UDP mode
-  
+
 #undef __GP_REGISTER8
 #undef __GP_REGISTER16
 #undef __GP_REGISTER_N
@@ -251,6 +250,8 @@ private:
   static inline uint8_t writeSn(SOCKET _s, uint16_t _addr, uint8_t _data);
   static inline uint16_t readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
   static inline uint16_t writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
+  inline void rawIPAddress(IPAddress src, uint8_t *dst);
+
 
   static const uint16_t CH_BASE = 0x0400;
   static const uint16_t CH_SIZE = 0x0100;
@@ -282,7 +283,7 @@ private:
   static uint16_t read##name(SOCKET _s, uint8_t *_buff) {    \
     return readSn(_s, address, _buff, size);                 \
   }
-  
+
 public:
   __SOCKET_REGISTER8(SnMR,        0x0000)        // Mode
   __SOCKET_REGISTER8(SnCR,        0x0001)        // Command
@@ -302,7 +303,7 @@ public:
   __SOCKET_REGISTER16(SnRX_RSR,   0x0026)        // RX Free Size
   __SOCKET_REGISTER16(SnRX_RD,    0x0028)        // RX Read Pointer
   __SOCKET_REGISTER16(SnRX_WR,    0x002A)        // RX Write Pointer (supported?)
-  
+
 #undef __SOCKET_REGISTER8
 #undef __SOCKET_REGISTER16
 #undef __SOCKET_REGISTER_N
@@ -322,21 +323,21 @@ private:
   uint16_t RBASE[SOCKETS]; // Rx buffer base address
 
 
-private:
-#define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
+public:
 #if SPI_TO_USE == 1
   #define ETHERNET_SHIELD_SPI_CS D5
 #else
   #define ETHERNET_SHIELD_SPI_CS A2
 #endif
 
+public:
 #if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
-  #define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
-  inline static void initSS() { pinMode(ETHERNET_SHIELD_SPI_CS, OUTPUT); };
-  inline static void setSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, LOW); };
-  inline static void resetSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, HIGH); };
+  #define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
+  inline static void initSS() { pinMode(ETHERNET_SHIELD_SPI_CS, OUTPUT); pinMode(D7, OUTPUT);};
+  inline static void setSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, LOW); digitalWrite(D7, LOW);};
+  inline static void resetSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, HIGH);digitalWrite(D7, HIGH); };
 #else
-  #define SPI_ETHERNET_SETTINGS ETHERNET_SHIELD_SPI_CS,SPISettings(4000000, MSBFIRST, SPI_MODE0)
+  #define SPI_ETHERNET_SETTINGS ETHERNET_SHIELD_SPI_CS,SPISettings(8000000, MSBFIRST, SPI_MODE0)
   // initSS(), setSS(), resetSS() not needed with EXTENDED_CS_PIN_HANDLING
 #endif
 
@@ -360,22 +361,6 @@ uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t 
   return write(CH_BASE + _s * CH_SIZE + _addr, _buf, _len);
 }
 
-void W5100Class::getGatewayIp(uint8_t *_addr) {
-  readGAR(_addr);
-}
-
-void W5100Class::setGatewayIp(uint8_t *_addr) {
-  writeGAR(_addr);
-}
-
-void W5100Class::getSubnetMask(uint8_t *_addr) {
-  readSUBR(_addr);
-}
-
-void W5100Class::setSubnetMask(uint8_t *_addr) {
-  writeSUBR(_addr);
-}
-
 void W5100Class::getMACAddress(uint8_t *_addr) {
   readSHAR(_addr);
 }
@@ -384,12 +369,40 @@ void W5100Class::setMACAddress(uint8_t *_addr) {
   writeSHAR(_addr);
 }
 
-void W5100Class::getIPAddress(uint8_t *_addr) {
+IPAddress W5100Class::getIPAddress() {
+  uint8_t _addr [4];
   readSIPR(_addr);
+  return IPAddress(_addr);
 }
 
-void W5100Class::setIPAddress(uint8_t *_addr) {
+void W5100Class::setIPAddress(IPAddress addr) {
+  uint8_t _addr [4];
+  rawIPAddress(addr, _addr);
   writeSIPR(_addr);
+}
+
+IPAddress W5100Class::getSubnetMask() {
+  uint8_t _addr [4];
+  readSUBR(_addr);
+  return IPAddress(_addr);
+}
+
+void W5100Class::setSubnetMask(IPAddress addr) {
+  uint8_t _addr [4];
+  rawIPAddress(addr, _addr);
+  writeSUBR(_addr);
+}
+
+IPAddress W5100Class::getGatewayIp() {
+  uint8_t _addr [4];
+  readGAR(_addr);
+  return IPAddress(_addr);
+}
+
+void W5100Class::setGatewayIp(IPAddress addr) {
+  uint8_t _addr [4];
+  rawIPAddress(addr, _addr);
+  writeGAR(_addr);
 }
 
 void W5100Class::setRetransmissionTime(uint16_t _timeout) {
@@ -398,6 +411,15 @@ void W5100Class::setRetransmissionTime(uint16_t _timeout) {
 
 void W5100Class::setRetransmissionCount(uint8_t _retry) {
   writeRCR(_retry);
+}
+
+void W5100Class::rawIPAddress(IPAddress address, uint8_t *dst) {
+    uint8_t* src =  (uint8_t*)&address.raw().ipv4;
+
+    uint8_t size = 4;
+    for ( uint8_t i = 0; i < size; i++ ) {
+        *(dst + i) = *(src + (size - i  - 1));
+    }
 }
 
 #endif

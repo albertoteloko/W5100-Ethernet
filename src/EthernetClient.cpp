@@ -54,7 +54,10 @@ int EthernetClient::connect(IPAddress ip, uint16_t port) {
   if (_srcport == 0) _srcport = 49152;          //Use IANA recommended ephemeral port range 49152-65535
   socket(_sock, SnMR::TCP, _srcport, 0);
 
-  if (!::connect(_sock, rawIPAddress(ip), port)) {
+  uint8_t rawIp [4];
+  rawIPAddress(ip, rawIp);
+
+  if (!::connect(_sock, rawIp, port)) {
     _sock = MAX_SOCK_NUM;
     return 0;
   }

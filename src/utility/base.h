@@ -4,10 +4,14 @@
 
 class Base {
 public:
-  uint8_t* rawIPAddress(IPAddress addr) {
-    return (uint8_t*)&addr.raw().ipv4;
+  void rawIPAddress(IPAddress address, uint8_t *dst) {
+    uint8_t* src =  (uint8_t*)&address.raw().ipv4;
+
+    uint8_t size = 4;
+    for ( uint8_t i = 0; i < size; i++ ) {
+        *(dst + i) = *(src + (size - i  - 1));
+    }
   };
 };
-
 
 #endif
