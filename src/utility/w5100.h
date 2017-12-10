@@ -129,6 +129,8 @@ public:
 class W5100Class : public Base {
 
 public:
+  void spi(SPIClass ethernetSPI, uint16_t ethernetSPICS);
+
   void init();
 
   /**
@@ -322,27 +324,22 @@ private:
   uint16_t SBASE[SOCKETS]; // Tx buffer base address
   uint16_t RBASE[SOCKETS]; // Rx buffer base address
 
+  static SPIClass _ethernetSPI;
+  static uint16_t _ethernetSPICS;
+
 public:
-#if !defined(ETHERNET_SHIELD_SPI)
-    #define ETHERNET_SHIELD_SPI SPI
-#endif
-
-#if !defined(ETHERNET_SHIELD_SPI_CS)
-    #define ETHERNET_SHIELD_SPI_CS A2
-#endif
-
 #define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
 
-inline static void initSS() { pinMode(ETHERNET_SHIELD_SPI_CS, OUTPUT);};
-inline static void setSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, LOW);};
-inline static void resetSS() { digitalWrite(ETHERNET_SHIELD_SPI_CS, HIGH); };
+inline static void initSS() { pinMode(_ethernetSPICS, OUTPUT);};
+inline static void setSS() { digitalWrite(_ethernetSPICS, LOW);};
+inline static void resetSS() { digitalWrite(_ethernetSPICS, HIGH); };
 
-inline static void beginTransaction() { ETHERNET_SHIELD_SPI.beginTransaction(SPI_ETHERNET_SETTINGS);};
-inline static void endTransaction() { ETHERNET_SHIELD_SPI.endTransaction();};
+inline static void beginTransaction() {_ethernetSPI.beginTransaction(SPI_ETHERNET_SETTINGS);};
+inline static void endTransaction() { _ethernetSPI.endTransaction();};
 
 private:
-inline static void spiBegin() { ETHERNET_SHIELD_SPI.begin();};
-inline static uint8_t spiTransfer(uint8_t value) { return ETHERNET_SHIELD_SPI.transfer(value);};
+inline static void spiBegin() { _ethernetSPI.begin();};
+inline static uint8_t spiTransfer(uint8_t value) { return _ethernetSPI.transfer(value);};
 
 };
 

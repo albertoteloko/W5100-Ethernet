@@ -22,7 +22,17 @@ W5100Class W5100;
 #define TXBUF_BASE 0x4000
 #define RXBUF_BASE 0x6000
 
-void W5100Class::init(void)
+
+SPIClass W5100Class::_ethernetSPI = SPI;
+uint16_t W5100Class::_ethernetSPICS = A2;
+
+void W5100Class::spi(SPIClass ethernetSPI, uint16_t ethernetSPICS)
+{
+  _ethernetSPI = ethernetSPI;
+  _ethernetSPICS = ethernetSPICS;
+}
+
+void W5100Class::init()
 {
   delay(300);
 
