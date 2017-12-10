@@ -178,3 +178,8 @@ bool EthernetClient::operator==(const EthernetClient& rhs) {
 uint8_t EthernetClient::getSocketNumber() {
   return _sock;
 }
+
+IPAddress EthernetClient::remoteIP()
+{
+  return W5100.getRemoteIP(_sock);
+}

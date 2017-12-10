@@ -180,8 +180,10 @@ public:
   inline void setSubnetMask(IPAddress address);
   inline IPAddress getSubnetMask();
 
-  inline void setGatewayIp(IPAddress address);
-  inline IPAddress getGatewayIp();
+  inline void setGatewayIP(IPAddress address);
+  inline IPAddress getGatewayIP();
+
+  inline IPAddress getRemoteIP(uint8_t socket);
 
   inline void setRetransmissionTime(uint16_t timeout);
   inline void setRetransmissionCount(uint8_t _retry);
@@ -393,16 +395,22 @@ void W5100Class::setSubnetMask(IPAddress addr) {
   writeSUBR(_addr);
 }
 
-IPAddress W5100Class::getGatewayIp() {
+IPAddress W5100Class::getGatewayIP() {
   uint8_t _addr [4];
   readGAR(_addr);
   return IPAddress(_addr);
 }
 
-void W5100Class::setGatewayIp(IPAddress addr) {
+void W5100Class::setGatewayIP(IPAddress addr) {
   uint8_t _addr [4];
   rawIPAddress(addr, _addr);
   writeGAR(_addr);
+}
+
+IPAddress W5100Class::getRemoteIP(uint8_t socket) {
+  uint8_t _addr [4];
+  readSnDIPR(socket, _addr);
+  return IPAddress(_addr);
 }
 
 void W5100Class::setRetransmissionTime(uint16_t _timeout) {

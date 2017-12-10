@@ -4,8 +4,6 @@
 #include "W5100Client.h"
 #include "W5100Server.h"
 
-class EthernetClient;
-
 class EthernetServer :
 public W5100Server {
 private:

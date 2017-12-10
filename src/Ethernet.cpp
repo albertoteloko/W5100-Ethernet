@@ -29,7 +29,7 @@ int EthernetClass::begin(uint8_t *mac_address, unsigned long timeout, unsigned l
     // accordingly
     W5100.beginTransaction();
     W5100.setIPAddress(_dhcp->getLocalIp());
-    W5100.setGatewayIp(_dhcp->getGatewayIp());
+    W5100.setGatewayIP(_dhcp->getGatewayIp());
     W5100.setSubnetMask(_dhcp->getSubnetMask());
     W5100.endTransaction();
     _dnsServerAddress = _dhcp->getDnsServerIp();
@@ -68,7 +68,7 @@ void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress dns_server
   W5100.beginTransaction();
   W5100.setMACAddress(mac);
   W5100.setIPAddress(local_ip);
-  W5100.setGatewayIp(gateway);
+  W5100.setGatewayIP(gateway);
   W5100.setSubnetMask(subnet);
   W5100.endTransaction();
   _dnsServerAddress = dns_server;
@@ -88,7 +88,7 @@ int EthernetClass::maintain(){
         //we might have got a new IP.
         W5100.beginTransaction();
         W5100.setIPAddress(_dhcp->getLocalIp());
-        W5100.setGatewayIp(_dhcp->getGatewayIp());
+        W5100.setGatewayIP(_dhcp->getGatewayIp());
         W5100.setSubnetMask(_dhcp->getSubnetMask());
         W5100.endTransaction();
         _dnsServerAddress = _dhcp->getDnsServerIp();
@@ -120,7 +120,7 @@ IPAddress EthernetClass::subnetMask()
 IPAddress EthernetClass::gatewayIP()
 {
   W5100.beginTransaction();
-  IPAddress ret = W5100.getGatewayIp();
+  IPAddress ret = W5100.getGatewayIP();
   W5100.endTransaction();
   return ret;
 }
