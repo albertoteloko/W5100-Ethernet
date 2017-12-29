@@ -133,6 +133,8 @@ public:
 
   void init();
 
+  void end();
+
   /**
    * @brief	This function is being used for copy the data form Receive buffer of the chip to application buffer.
    * 
@@ -341,6 +343,7 @@ inline static void endTransaction() { _ethernetSPI.endTransaction();};
 
 private:
 inline static void spiBegin() { _ethernetSPI.begin();};
+inline static void spiEnd() { _ethernetSPI.end();};
 inline static uint8_t spiTransfer(uint8_t value) { return _ethernetSPI.transfer(value);};
 
 };

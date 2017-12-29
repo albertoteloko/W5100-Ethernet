@@ -50,6 +50,13 @@ void W5100Class::init()
   }
 }
 
+void W5100Class::end()
+{
+  delay(300);
+
+  spiEnd();
+}
+
 uint16_t W5100Class::getTXFreeSize(SOCKET s)
 {
   uint16_t val=0, val1=0;
