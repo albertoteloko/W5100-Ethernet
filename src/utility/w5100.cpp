@@ -34,27 +34,32 @@ void W5100Class::spi(SPIClass ethernetSPI, uint16_t ethernetSPICS)
 
 void W5100Class::init()
 {
-  delay(300);
+    if(!started){
+      delay(300);
 
-  spiBegin();
-  initSS();
-  beginTransaction();
-  writeMR(1<<RST);
-  writeTMSR(0x55);
-  writeRMSR(0x55);
-  endTransaction();
+      spiBegin();
+      initSS();
+      beginTransaction();
+      writeMR(1<<RST);
+      writeTMSR(0x55);
+      writeRMSR(0x55);
+      endTransaction();
 
-  for (int i=0; i<MAX_SOCK_NUM; i++) {
-    SBASE[i] = TXBUF_BASE + SSIZE * i;
-    RBASE[i] = RXBUF_BASE + RSIZE * i;
+      for (int i=0; i<MAX_SOCK_NUM; i++) {
+        SBASE[i] = TXBUF_BASE + SSIZE * i;
+        RBASE[i] = RXBUF_BASE + RSIZE * i;
+      }
+      started = true;
   }
 }
 
 void W5100Class::end()
 {
-  delay(300);
-
-  spiEnd();
+    if(started){
+      spiEnd();
+      delay(300);
+      started = false;
+    }
 }
 
 uint16_t W5100Class::getTXFreeSize(SOCKET s)

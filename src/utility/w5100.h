@@ -202,6 +202,7 @@ private:
   static uint16_t write(uint16_t addr, const uint8_t *buf, uint16_t len);
   static uint8_t read(uint16_t addr);
   static uint16_t read(uint16_t addr, uint8_t *buf, uint16_t len);
+  bool started = false;
 
 #define __GP_REGISTER8(name, address)             \
   static inline void write##name(uint8_t _data) { \

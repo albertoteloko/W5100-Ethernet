@@ -11,6 +11,7 @@ extern "C" {
 EthernetServer::EthernetServer(uint16_t port)
 {
   _port = port;
+  _sock = NO_SOCK;
 }
 
 void EthernetServer::setPort(uint16_t port)
@@ -20,17 +21,17 @@ void EthernetServer::setPort(uint16_t port)
 
 void EthernetServer::end()
 {
-  if(_sock > -1)
+  if(_sock != NO_SOCK)
   {
     close(_sock);
     EthernetClass::_server_port[_sock] = 0;
-    _sock = -1;
+    _sock = NO_SOCK;
   }
 }
 
 void EthernetServer::begin()
 {
-  if(_sock == -1){
+  if(_sock == NO_SOCK){
       for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
         EthernetClient client(sock);
         if (client.status() == SnSR::CLOSED) {

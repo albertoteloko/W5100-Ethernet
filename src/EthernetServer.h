@@ -4,11 +4,13 @@
 #include "W5100Client.h"
 #include "W5100Server.h"
 
+#define NO_SOCK 666
+
 class EthernetServer :
 public W5100Server {
 private:
   uint16_t _port;
-  uint16_t _sock = -1;
+  uint16_t _sock = NO_SOCK;
   void accept();
 public:
   EthernetServer(uint16_t);
