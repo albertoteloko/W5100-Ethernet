@@ -13,6 +13,11 @@ EthernetServer::EthernetServer(uint16_t port)
   _port = port;
 }
 
+void EthernetServer::setPort(uint16_t port)
+{
+  _port = port;
+}
+
 void EthernetServer::end()
 {
   if(_sock > -1)
