@@ -31,17 +31,15 @@ void EthernetServer::end()
 
 void EthernetServer::begin()
 {
-  if(_sock == NO_SOCK){
-      for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
-        EthernetClient client(sock);
-        if (client.status() == SnSR::CLOSED) {
-          _sock = sock;
-          socket(sock, SnMR::TCP, _port, 0);
-          listen(sock);
-          EthernetClass::_server_port[sock] = _port;
-          break;
-        }
-      }
+  for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
+    EthernetClient client(sock);
+    if (client.status() == SnSR::CLOSED) {
+      _sock = sock;
+      socket(sock, SnMR::TCP, _port, 0);
+      listen(sock);
+      EthernetClass::_server_port[sock] = _port;
+      break;
+    }
   }
 }
 
